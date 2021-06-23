@@ -13,13 +13,14 @@ var schema = buildSchema(`
   type Recipe {
     id: Int!
     name: String!
-    ingredients: String!
+    ingredients: [String!]!
   }
 
   type Query {
     hello: String
-    rollDice(numDice: Int!, numSides: Int): [Int]
+    rollDice(numDice: Int!, numSides: Int): [Int]!
     recipe(id: Int!) : Recipe
+    ingredients(recipeId: Int!) : [String!]!
   }
 
   type Mutation {
@@ -40,11 +41,17 @@ var root = {
     return output;
   },
   recipe: ({ id }) => {
+    parent = this;
     return {
       id: id,
       name: "Food",
-      directions: "do stuff"
+      directions: "do stuff",
+      ingredients: () => root.ingredients({ recipeId: id })
     };
+  },
+  ingredients: ({ recipeId }) => {
+    console.log("Ingredients called");
+    return ['one', 'two', recipeId.toString()];
   },
   saveRecipe: ({ recipe }) => {
     console.log(recipe);
