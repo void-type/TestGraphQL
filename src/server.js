@@ -4,6 +4,16 @@ var { buildSchema } = require('graphql');
 
 // Construct a schema, using GraphQL schema language
 var schema = buildSchema(`
+  enum SortDirection {
+    ASC
+    DESC
+  }
+
+  input SortBy {
+    field: String!
+    direction: SortDirection!
+  }
+
   input SaveRecipeInput {
     id: Int!
     name: String!
@@ -20,7 +30,7 @@ var schema = buildSchema(`
     hello: String
     rollDice(numDice: Int!, numSides: Int): [Int]!
     recipe(id: Int!) : Recipe
-    ingredients(recipeId: Int!) : [String!]!
+    ingredients(recipeId: Int!, nameContains: String = null, sortBy: SortBy = {field: "id", direction: ASC}) : [String!]!
   }
 
   type Mutation {
@@ -49,8 +59,9 @@ var root = {
       ingredients: () => root.ingredients({ recipeId: id })
     };
   },
-  ingredients: ({ recipeId }) => {
-    console.log("Ingredients called");
+  ingredients: ({ recipeId, nameContains, sortBy }) => {
+    console.log(sortBy);
+    console.log(nameContains);
     return ['one', 'two', recipeId.toString()];
   },
   saveRecipe: ({ recipe }) => {
